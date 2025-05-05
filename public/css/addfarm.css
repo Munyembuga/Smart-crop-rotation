@@ -1,0 +1,215 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+    display: flex;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar {
+    background-color: #f0f2f5;
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Make sidebar full height */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    color: #333;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    padding-left: 10px;
+}
+
+.logo a {
+    color: #333;
+    text-decoration: none;
+}
+
+.navigation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation ul li a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #555;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.navigation ul li a:hover {
+    background-color: #e9ecef;
+}
+
+.navigation ul li.active a {
+    background-color: #28a745; /* Green active color */
+    color: white;
+}
+
+.navigation ul li a i.icon {
+    margin-right: 10px;
+    /* Add your icon styling here, e.g., font-awesome */
+}
+
+.logout {
+    margin-top: 20px; /* Push logout to the bottom */
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.logout-button {
+    background-color: #28a745; /* Red logout button */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.welcome {
+    font-size: 1.2em;
+    color: #333;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.notification-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #555;
+    margin-right: 15px;
+    /* Add your notification icon styling */
+}
+
+.user-profile {
+    background-color: #007bff; /* Blue user avatar background */
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    /* You might use an actual image here */
+}
+
+.content-area {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.form-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    color: #333;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-header i.add-icon {
+    margin-right: 10px;
+    color: #28a745; /* Green add icon color */
+    /* Add your add icon styling */
+}
+
+.form-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+.add-button {
+    background-color: #28a745; /* Green add button */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.add-button:hover {
+    background-color: #218838;
+}
+
+/* You'll need to add your icon font library (e.g., Font Awesome)
+   to get the actual icons to display. For example, in your <head>
+   you might add:
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+   Then you can use classes like <i class="fas fa-home"></i> for icons.
+   Replace the generic <i class="icon"></i> and <i class="icon add-icon"></i>
+   with the appropriate icon classes from your chosen library.
+*/

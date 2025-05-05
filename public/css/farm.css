@@ -1,0 +1,318 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f4f6f8;
+    display: flex;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: #fff;
+    color: #333;
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar .logo a {
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.sidebar .logo h1 {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.sidebar .nav {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.sidebar .nav-item {
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-item.active .nav-link {
+    background-color: #e9ecef;
+    color: #007bff; /* Example active color */
+}
+
+.sidebar .nav-link .icon {
+    margin-right: 10px;
+    font-size: 1.2em; /* Placeholder for icons */
+}
+
+.sidebar .logout-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: auto;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .logout-btn:hover {
+    background-color: #218838;
+}
+
+/* Main Content Styles */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header .welcome {
+    font-size: 1.2em;
+    color: #555;
+}
+
+.header .user-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header .notification-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 15px;
+    font-size: 1.2em; /* Placeholder for notification icon */
+    color: #777;
+}
+
+.header .user-profile {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc; /* Placeholder for user avatar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Farm Management Section Styles */
+.farm-management-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.farm-management-section .section-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.farm-management-section .section-header .actions {
+    display: flex;
+    align-items: center;
+}
+
+.farm-management-section .section-header .view-by {
+    margin-right: 15px;
+    color: #555;
+}
+
+.farm-management-section .section-header .view-by select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.farm-management-section .section-header .add-farm-btn {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.farm-management-section .section-header .add-farm-btn:hover {
+    background-color: #218838;
+}
+
+/* Table Styles */
+.table-wrapper {
+    overflow-x: auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+.actions-cell button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.actions-cell .delete-btn {
+    background-color: #dc3545;
+}
+
+.actions-cell .delete-btn:hover {
+    background-color: #c82333;
+}
+
+.actions-cell .edit-btn {
+    background-color: #007bff;
+}
+
+.actions-cell .edit-btn:hover {
+    background-color: #0056b3;
+}
+
+.actions-cell .details-btn {
+    background-color: #28a745;
+}
+
+.actions-cell .details-btn:hover {
+    background-color: #218838;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+    background-color: #fff;
+    color: #555;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+    background-color: #e9ecef;
+}
+
+.pagination .page-numbers .active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination .prev-btn,
+.pagination .next-btn {
+    background-color: #f8f9fa;
+}
+
+.pagination .prev-btn:hover,
+.pagination .next-btn:hover {
+    background-color: #e2e6ea;
+}
+
+/* Placeholder for Icons - You'll need to integrate an icon library */
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    /* Add your icon styles here or use an icon font/library */
+}
+
+.dashboard-icon::before {
+    content: "D";
+}
+.overview-icon::before {
+    content: "O";
+}
+.statistics-icon::before {
+    content: "S";
+}
+.device-icon::before {
+    content: "V";
+}
+.farm-icon::before {
+    content: "F";
+}
+.settings-icon::before {
+    content: "C";
+}
+.notification-bell::before {
+    content: "N";
+}
+.user-avatar::before {
+    content: "U";
+}
