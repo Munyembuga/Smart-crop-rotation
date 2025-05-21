@@ -2,31 +2,33 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
+        'phone',
         'password',
+        'role_id',
+        'status'
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -34,19 +36,54 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'last_login' => 'datetime',
+    ];
+
+    /**
+     * Get the role associated with the user
+     */
+    public function role()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Role::class);
     }
 
-    public function usersFarms(){
-        return $this->hasMany(Farm::class, 'user_id');
+    /**
+     * Check if the user has a specific role
+     *
+     * @param string $roleName
+     * @return bool
+     */
+    public function hasRole($roleName)
+    {
+        return $this->role->name === $roleName;
+    }
+
+    /**
+     * Check if the user is an admin (any admin role)
+     *
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        return in_array($this->role->name, ['SectorAdmin', 'DistrictAdmin', 'SystemAdmin']);
+    }
+
+    /**
+     * Get the farms that belong to this user
+     */
+    public function farms()
+    {
+        return $this->hasMany(Farm::class);
     }
 }

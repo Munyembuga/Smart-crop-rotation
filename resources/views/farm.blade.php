@@ -3,116 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm Management</title>
-    <link rel="stylesheet" href="{{ asset('css/farm.css') }}">
+    <title>My Farms - Smart Crop Rotation</title>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .farm-list {
+            margin-top: 20px;
+        }
+        .farm-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .farm-card h3 {
+            margin-top: 0;
+        }
+        .no-farms {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .farm-actions {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
+    <div class="header">
+        <h1>Smart Crop Rotation</h1>
+        <div>
+            <a href="{{ route('dashboard') }}" style="color: white; text-decoration: none; margin-right: 15px;">Dashboard</a>
+            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                @csrf
+                <button type="submit" style="background: none; border: none; color: white; cursor: pointer;">Logout</button>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
-        <aside class="sidebar">
-            <div class="logo">
-                <a href="{{ route('backtohome')}}">← Back To Home</a>
-                <h1>Crop Rotation System</h1>
+        <div class="content">
+            <h2>My Farms</h2>
+            <div>
+                <a href="{{ route('addfarm') }}" class="btn">Add New Farm</a>
+                <a href="{{ route('dashboard') }}" class="btn">Back to Dashboard</a>
             </div>
-            <ul class="nav">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="icon dashboard-icon"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="icon overview-icon"></i> Overview
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="icon statistics-icon"></i> Statistics
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('userdevice')}}" class="nav-link">
-                        <i class="icon device-icon"></i> Device Management
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a href="#" class="nav-link">
-                        <i class="icon farm-icon"></i> Farm Management
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="icon settings-icon"></i> Settings
-                    </a>
-                </li>
-            </ul>
-            <button class="logout-btn">Logout</button>
-        </aside>
-        <main class="content">
-            <header class="header">
-                <div class="welcome">Welcome Back, Osuald</div>
-                <div class="user-actions">
-                    <button class="notification-btn">
-                        <i class="icon notification-bell"></i>
-                    </button>
-                    <div class="user-profile">
-                        <i class="icon user-avatar"></i>
-                    </div>
-                </div>
-            </header>
-            <div class="farm-management-section">
-                <div class="section-header">
-                    <h2>Farm Management</h2>
-                    <div class="actions">
-                        <div class="view-by">
-                            View By:
-                            <select>
-                                <option>All</option>
-                                <option>Location</option>
-                            </select>
+
+            <div class="farm-list">
+                @if(count($farms) > 0)
+                    @foreach($farms as $farm)
+                        <div class="farm-card">
+                            <h3>{{ $farm->name }}</h3>
+                            <p>Location: {{ $farm->location }}</p>
+                            <p>Size: {{ $farm->size }} hectares</p>
+                            <div class="farm-actions">
+                                <a href="#" class="btn">View Details</a>
+                                <a href="#" class="btn">Edit</a>
+                            </div>
                         </div>
-                        <button onclick="window.location.href='{{ route('addfarm') }}'" class="add-farm-btn">+ Add Farm</button>
+                    @endforeach
+                @else
+                    <div class="no-farms">
+                        <p>You don't have any farms yet. Click "Add New Farm" to create your first farm.</p>
                     </div>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                {{-- <th>Farm Id</th> --}}
-                                <th>Plot Number</th>
-                                <th>Description</th>
-                                <th>Location</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($farms as $farm)
-                            <tr>
-                                {{-- <td>1</td> --}}
-                                <td>{{$farm['plot_number']}}</td>
-                                <td>{{$farm['description']}}</td>
-                                <td>{{$farm['location']}}</td>
-                                <td class="actions-cell">
-                                    <button class="delete-btn">Delete</button>
-                                    <button class="edit-btn">Edit</button>
-                                    <button class="details-btn">Details</button>
-                                </td>
-                            </tr>
-                            @endforeach                           
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination">
-                    <button class="prev-btn">Prev</button>
-                    <div class="page-numbers">
-                        <button class="page-btn">1</button>
-                        <button class="page-btn active">2</button>
-                        <button class="page-btn">...</button>
-                        <button class="page-btn">Next</button>
-                    </div>
-                    <button class="next-btn">Next</button>
-                </div>
+                @endif
             </div>
-        </main>
+        </div>
     </div>
 </body>
 </html>
