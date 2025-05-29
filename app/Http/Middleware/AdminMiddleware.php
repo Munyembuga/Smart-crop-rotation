@@ -4,22 +4,24 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        // Check if user is logged in and has admin role
-        if (!Auth::check() || Auth::user()->role_id != 4) {
-            return redirect()->route('farmer.dashboard')->with('error', 'You do not have admin privileges.');
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        // Check if user is admin (role_id 4) or has admin privileges
+        if (auth()->user()->role_id != 4) {
+            abort(403, 'Access denied. Admin privileges required.');
         }
 
         return $next($request);
