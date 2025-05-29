@@ -103,27 +103,29 @@ Route::middleware(['auth'])->group(function () {
         return view('farmer.dashboard');
     })->name('farmer.dashboard');
 
-    // Farmer Soil Management Routes
+    // Farmer Soil Management Routes - Remove duplicate middleware
     Route::prefix('farmer')->name('farmer.')->group(function () {
-        Route::get('/soil', [App\Http\Controllers\Farmer\SoilDataController::class, 'index'])->name('soil');
-        Route::get('/soil/live-data', [App\Http\Controllers\Farmer\SoilDataController::class, 'liveData'])->name('soil.live');
-        Route::get('/soil/recommendations', [App\Http\Controllers\Farmer\SoilDataController::class, 'recommendations'])->name('soil.recommendations');
-        Route::get('/soil/history', [App\Http\Controllers\Farmer\SoilDataController::class, 'history'])->name('soil.history');
-        Route::get('/soil/analytics', [App\Http\Controllers\Farmer\SoilDataController::class, 'analytics'])->name('soil.analytics');
-        Route::get('/soil/filters', [App\Http\Controllers\Farmer\SoilDataController::class, 'getFilters'])->name('soil.filters');
+        Route::middleware('farmer')->group(function () {
+            Route::get('/soil', [App\Http\Controllers\Farmer\SoilDataController::class, 'index'])->name('soil');
+            Route::get('/soil/live-data', [App\Http\Controllers\Farmer\SoilDataController::class, 'liveData'])->name('soil.live');
+            Route::get('/soil/recommendations', [App\Http\Controllers\Farmer\SoilDataController::class, 'recommendations'])->name('soil.recommendations');
+            Route::get('/soil/history', [App\Http\Controllers\Farmer\SoilDataController::class, 'history'])->name('soil.history');
+            Route::get('/soil/analytics', [App\Http\Controllers\Farmer\SoilDataController::class, 'analytics'])->name('soil.analytics');
+            Route::get('/soil/filters', [App\Http\Controllers\Farmer\SoilDataController::class, 'getFilters'])->name('soil.filters');
 
-        // Manual soil data input for farmers
-        Route::get('/soil/manual-input', [App\Http\Controllers\Farmer\SoilDataController::class, 'manualInput'])->name('soil.manual-input');
-        Route::post('/soil/manual-input', [App\Http\Controllers\Farmer\SoilDataController::class, 'storeManualData'])->name('soil.store-manual');
-        Route::get('/soil/analysis-results/{soil_data}', [App\Http\Controllers\Farmer\SoilDataController::class, 'analysisResults'])->name('soil.analysis-results');
-        Route::post('/soil/crop-history', [App\Http\Controllers\Farmer\SoilDataController::class, 'getCropHistory'])->name('soil.crop-history');
+            // Manual soil data input for farmers
+            Route::get('/soil/manual-input', [App\Http\Controllers\Farmer\SoilDataController::class, 'manualInput'])->name('soil.manual-input');
+            Route::post('/soil/manual-input', [App\Http\Controllers\Farmer\SoilDataController::class, 'storeManualData'])->name('soil.store-manual');
+            Route::get('/soil/analysis-results/{soil_data}', [App\Http\Controllers\Farmer\SoilDataController::class, 'analysisResults'])->name('soil.analysis-results');
+            Route::post('/soil/crop-history', [App\Http\Controllers\Farmer\SoilDataController::class, 'getCropHistory'])->name('soil.crop-history');
 
-        // Generate simulated data
-        Route::post('/soil/generate-demo-data', [App\Http\Controllers\Farmer\SoilDataController::class, 'generateDemoData'])->name('soil.generate-demo');
+            // Generate simulated data
+            Route::post('/soil/generate-demo-data', [App\Http\Controllers\Farmer\SoilDataController::class, 'generateDemoData'])->name('soil.generate-demo');
+        });
     });
 
-    // Admin routes - using class directly instead of alias
-    Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+    // Admin routes - using proper middleware alias
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         // Admin Dashboard
         Route::get('/dashboard', function () {
             return view('admin.dashboard');

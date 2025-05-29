@@ -1,12 +1,8 @@
 @extends('layouts.farmer')
 
-@section('title', 'Soil Management - Farmer Dashboard')
+@section('title', 'My Soil Management')
 
 @section('styles')
-<!-- Bootstrap 5 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Font Awesome -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Custom styles -->
@@ -47,12 +43,12 @@
     }
 
     .soil-modal-header {
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+        background: linear-gradient(135deg, #2c5530 0%, #4a7c4f 100%);
         color: white;
         padding: 15px 20px;
         border-radius: 12px 12px 0 0;
         display: flex;
-        justify-content: between;
+        justify-content: space-between;
         align-items: center;
     }
 
@@ -73,7 +69,7 @@
 
     .soil-option:hover {
         background-color: #f8f9fa;
-        border-color: #8B4513;
+        border-color: #2c5530;
         transform: translateX(5px);
     }
 
@@ -81,7 +77,7 @@
         margin-right: 12px;
         width: 20px;
         text-align: center;
-        color: #8B4513;
+        color: #2c5530;
     }
 
     .soil-option-content h6 {
@@ -104,7 +100,7 @@
     }
 
     .season-badge {
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+        background: linear-gradient(135deg, #2c5530 0%, #4a7c4f 100%);
         color: white;
         padding: 4px 12px;
         border-radius: 20px;
@@ -112,17 +108,12 @@
         font-weight: 600;
     }
 
-    .health-excellent { color: #28a745; }
-    .health-good { color: #17a2b8; }
-    .health-fair { color: #ffc107; }
-    .health-poor { color: #dc3545; }
-
     .stat-card {
         background: white;
         border-radius: 10px;
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border-left: 4px solid #8B4513;
+        border-left: 4px solid #2c5530;
     }
 
     .filter-section {
@@ -140,10 +131,10 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #2c5530 0%, #4a7c4f 100%);">
                     <h3 class="mb-0"><i class="fas fa-seedling me-2"></i>My Soil Management Dashboard</h3>
                     <div>
-                        <span class="season-badge me-2" id="currentSeason">{{ date('Y') }} - {{ date('n') <= 6 ? 'Season A' : 'Season B' }}</span>
+                        <span class="season-badge me-2" id="currentSeason">Loading...</span>
                         <button type="button" class="btn btn-light btn-sm" onclick="showSoilModal()">
                             <i class="fas fa-chart-line me-2"></i>View Data
                         </button>
@@ -160,7 +151,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="mb-1 text-muted">My Devices</p>
-                        <h4 class="mb-0" id="totalDevices">{{ $stats['total_devices'] }}</h4>
+                        <h4 class="mb-0" id="totalDevices">-</h4>
                     </div>
                     <div class="text-primary">
                         <i class="fas fa-microchip fa-2x"></i>
@@ -173,7 +164,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="mb-1 text-muted">My Farms</p>
-                        <h4 class="mb-0" id="totalFarms">{{ $stats['total_farms'] }}</h4>
+                        <h4 class="mb-0" id="totalFarms">-</h4>
                     </div>
                     <div class="text-success">
                         <i class="fas fa-map-marker-alt fa-2x"></i>
@@ -185,8 +176,8 @@
             <div class="stat-card">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <p class="mb-1 text-muted">Recent Readings</p>
-                        <h4 class="mb-0" id="activeReadings">{{ $stats['active_readings'] }}</h4>
+                        <p class="mb-1 text-muted">My Readings</p>
+                        <h4 class="mb-0" id="totalReadings">-</h4>
                     </div>
                     <div class="text-info">
                         <i class="fas fa-chart-bar fa-2x"></i>
@@ -199,7 +190,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="mb-1 text-muted">Health Score</p>
-                        <h4 class="mb-0 health-{{ $stats['health_score'] >= 80 ? 'excellent' : ($stats['health_score'] >= 70 ? 'good' : ($stats['health_score'] >= 60 ? 'fair' : 'poor')) }}" id="healthScore">{{ $stats['health_score'] }}%</h4>
+                        <h4 class="mb-0" id="healthScore">-</h4>
                     </div>
                     <div class="text-warning">
                         <i class="fas fa-heartbeat fa-2x"></i>
@@ -209,52 +200,13 @@
         </div>
     </div>
 
-    <!-- Latest Readings Quick View -->
-    @if($latestSoilData->count() > 0)
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Latest Soil Readings</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        @foreach($latestSoilData->take(4) as $reading)
-                        <div class="col-md-3 mb-3">
-                            <div class="card border-left-{{ $reading->health_color }}">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6 class="text-muted">{{ $reading->device->name }}</h6>
-                                            <p class="mb-1"><strong>Farm:</strong> {{ $reading->farm->name ?? 'N/A' }}</p>
-                                            <p class="mb-1"><strong>pH:</strong> {{ $reading->ph }}</p>
-                                            <p class="mb-1"><strong>Moisture:</strong> {{ $reading->moisture }}%</p>
-                                            <p class="mb-0"><strong>Temp:</strong> {{ $reading->temperature }}°C</p>
-                                        </div>
-                                        <div class="text-center">
-                                            <span class="badge bg-{{ $reading->health_color }} mb-2">{{ $reading->health_status }}</span>
-                                            <br>
-                                            <small class="text-muted">{{ $reading->created_at->diffForHumans() }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-
     <!-- Content Sections -->
     <div id="mainContent">
         <!-- Live Data Section -->
-        <div id="liveDataSection" class="content-section">
+        <div id="liveDataSection" class="content-section active">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-satellite-dish me-2"></i>Live Soil Data</h5>
+                    <h5 class="mb-0"><i class="fas fa-satellite-dish me-2"></i>My Live Soil Data</h5>
                 </div>
                 <div class="card-body">
                     <div class="filter-section">
@@ -262,17 +214,11 @@
                             <div class="col-md-4">
                                 <select class="form-select" id="deviceFilter">
                                     <option value="">All My Devices</option>
-                                    @foreach($devices as $device)
-                                        <option value="{{ $device->id }}">{{ $device->name }} ({{ $device->type }})</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <select class="form-select" id="farmFilter">
                                     <option value="">All My Farms</option>
-                                    @foreach($farms as $farm)
-                                        <option value="{{ $farm->id }}">{{ $farm->name }} - {{ $farm->location }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-4">
@@ -287,7 +233,7 @@
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                            <p class="mt-2">Loading live data...</p>
+                            <p class="mt-2">Loading my soil data...</p>
                         </div>
                     </div>
                 </div>
@@ -298,7 +244,7 @@
         <div id="recommendationsSection" class="content-section">
             <div class="card shadow-sm">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Soil Recommendations for My Land</h5>
+                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>My Soil Recommendations</h5>
                 </div>
                 <div class="card-body">
                     <div id="recommendationsContent">
@@ -324,19 +270,16 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="startDate" value="{{ date('Y-m-d', strtotime('-30 days')) }}">
+                                <input type="date" class="form-control" id="startDate">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">End Date</label>
-                                <input type="date" class="form-control" id="endDate" value="{{ date('Y-m-d') }}">
+                                <input type="date" class="form-control" id="endDate">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Device</label>
-                                <select class="form-select" id="historyDeviceFilter">
-                                    <option value="">All Devices</option>
-                                    @foreach($devices as $device)
-                                        <option value="{{ $device->id }}">{{ $device->name }}</option>
-                                    @endforeach
+                                <label class="form-label">Season</label>
+                                <select class="form-select" id="seasonFilter">
+                                    <option value="">All Seasons</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -435,31 +378,115 @@
 @endsection
 
 @section('scripts')
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 let currentSection = 'liveData';
+let filters = {};
 
-// Initialize the dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    // Load initial data
-    loadLiveData();
-
-    // Add CSRF token to meta tag if it doesn't exist
-    if (!document.querySelector('meta[name="csrf-token"]')) {
-        const meta = document.createElement('meta');
-        meta.name = 'csrf-token';
-        meta.content = '{{ csrf_token() }}';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-    }
-});
-
+// Add CSRF token function
 function getCSRFToken() {
     const token = document.querySelector('meta[name="csrf-token"]');
-    return token ? token.getAttribute('content') : '';
+    if (token) {
+        return token.getAttribute('content');
+    }
+    return '';
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadInitialData();
+    loadFilters();
+    showSection('liveData');
+});
+
+function loadInitialData() {
+    fetch('/farmer/soil/analytics', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            document.getElementById('totalDevices').textContent = data.stats.total_devices || 0;
+            document.getElementById('totalFarms').textContent = data.stats.total_farms || 0;
+            document.getElementById('totalReadings').textContent = data.stats.total_readings || 0;
+            document.getElementById('healthScore').textContent = Math.round(data.stats.avg_health_score || 0) + '%';
+            document.getElementById('currentSeason').textContent = data.season || 'Current Season';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading stats:', error);
+        document.getElementById('totalDevices').textContent = '0';
+        document.getElementById('totalFarms').textContent = '0';
+        document.getElementById('totalReadings').textContent = '0';
+        document.getElementById('healthScore').textContent = '0%';
+        document.getElementById('currentSeason').textContent = 'Current Season';
+    });
+}
+
+function loadFilters() {
+    fetch('/farmer/soil/filters', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            filters = data;
+            populateFilters();
+        }
+    })
+    .catch(error => {
+        console.error('Error loading filters:', error);
+        filters = { devices: [], farms: [], seasons: ['Season A', 'Season B'] };
+        populateFilters();
+    });
+}
+
+function populateFilters() {
+    const deviceSelect = document.getElementById('deviceFilter');
+    if (deviceSelect) {
+        deviceSelect.innerHTML = '<option value="">All My Devices</option>';
+        if (filters.devices && filters.devices.length > 0) {
+            filters.devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.textContent = `${device.device_name || device.name}`;
+                deviceSelect.appendChild(option);
+            });
+        }
+    }
+
+    const farmSelect = document.getElementById('farmFilter');
+    if (farmSelect) {
+        farmSelect.innerHTML = '<option value="">All My Farms</option>';
+        if (filters.farms && filters.farms.length > 0) {
+            filters.farms.forEach(farm => {
+                const option = document.createElement('option');
+                option.value = farm.id;
+                option.textContent = `${farm.name} - ${farm.location || 'Location'}`;
+                farmSelect.appendChild(option);
+            });
+        }
+    }
 }
 
 function showSoilModal() {
@@ -473,30 +500,22 @@ function hideSoilModal() {
 }
 
 function showSection(section) {
-    // Hide all sections
-    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-
-    // Show selected section
-    document.getElementById(section + 'Section').classList.add('active');
-    currentSection = section;
-
-    // Hide modal
     hideSoilModal();
 
-    // Load data for the section
-    switch(section) {
-        case 'liveData':
-            loadLiveData();
-            break;
-        case 'recommendations':
-            loadRecommendations();
-            break;
-        case 'history':
-            loadHistory();
-            break;
-        case 'analytics':
-            loadAnalytics();
-            break;
+    document.querySelectorAll('.content-section').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    const sectionElement = document.getElementById(section + 'Section');
+    if (sectionElement) {
+        sectionElement.classList.add('active');
+        currentSection = section;
+
+        switch(section) {
+            case 'liveData':
+                loadLiveData();
+                break;
+        }
     }
 }
 
@@ -508,326 +527,179 @@ function loadLiveData() {
     if (deviceId) params.append('device_id', deviceId);
     if (farmId) params.append('farm_id', farmId);
 
-    fetch(`{{ route('farmer.soil.live') }}?${params.toString()}`, {
-        method: 'GET',
+    document.getElementById('liveDataContent').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Fetching my soil data...</p>
+        </div>
+    `;
+
+    fetch(`/farmer/soil/live-data?${params}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            renderLiveData(data.data);
+            renderLiveData(data.data, data.season);
         } else {
             throw new Error(data.message || 'Failed to load live data');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error loading live data:', error);
         document.getElementById('liveDataContent').innerHTML = `
-            <div class="alert alert-danger">
+            <div class="alert alert-warning">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                Error loading live data: ${error.message}
+                <strong>No data available yet:</strong> ${error.message}
+                <br><small>You don't have any devices set up or soil data recorded yet.</small>
+                <button onclick="generateDemoData()" class="btn btn-sm btn-primary ms-2">Generate Demo Data</button>
             </div>
         `;
     });
 }
 
-function renderLiveData(data) {
-    const container = document.getElementById('liveDataContent');
-
-    if (!data || data.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No live data available</h5>
-                <p class="text-muted">No recent soil readings found for your devices.</p>
-                <a href="{{ route('farmer.soil.manual-input') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i>Add Manual Reading
-                </a>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '<div class="row">';
-
-    data.forEach(reading => {
-        html += `
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card border-left-${reading.health_color}">
-                    <div class="card-header bg-${reading.health_color} text-white">
-                        <h6 class="mb-0">
-                            <i class="fas fa-microchip me-1"></i>
-                            ${reading.device ? reading.device.name : 'Unknown Device'}
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <h5 class="text-primary">${reading.ph}</h5>
-                                <small class="text-muted">pH Level</small>
-                            </div>
-                            <div class="col-4">
-                                <h5 class="text-success">${reading.moisture}%</h5>
-                                <small class="text-muted">Moisture</small>
-                            </div>
-                            <div class="col-4">
-                                <h5 class="text-warning">${reading.temperature}°C</h5>
-                                <small class="text-muted">Temperature</small>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="badge bg-${reading.health_color}">${reading.health_status}</span>
-                            <small class="text-muted">${new Date(reading.created_at).toLocaleString()}</small>
-                        </div>
-                        <div class="mt-2">
-                            <strong>Farm:</strong> ${reading.farm ? reading.farm.name : 'N/A'}<br>
-                            <strong>Health Score:</strong> ${reading.soil_health_score}%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-function loadRecommendations() {
-    document.getElementById('recommendationsContent').innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-info" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading recommendations...</p>
-        </div>
-    `;
-
-    fetch('{{ route('farmer.soil.recommendations') }}', {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            renderRecommendations(data.recommendations);
-        } else {
-            throw new Error(data.message || 'Failed to load recommendations');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('recommendationsContent').innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Error loading recommendations: ${error.message}
-            </div>
-        `;
-    });
-}
-
-function renderRecommendations(recommendations) {
-    const container = document.getElementById('recommendationsContent');
-
-    if (!recommendations || recommendations.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-lightbulb fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No recommendations available</h5>
-                <p class="text-muted">Add soil data to get personalized recommendations.</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '';
-
-    recommendations.forEach(item => {
-        html += `
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-map-marker-alt me-1"></i>
-                        ${item.farm ? item.farm.name : 'Unknown Farm'} - ${item.device ? item.device.name : 'Unknown Device'}
-                    </h6>
-                </div>
-                <div class="card-body">
-        `;
-
-        if (item.recommendations && item.recommendations.length > 0) {
-            item.recommendations.forEach(rec => {
-                const priorityColor = rec.priority === 'high' ? 'danger' : (rec.priority === 'medium' ? 'warning' : 'info');
-                html += `
-                    <div class="alert alert-${priorityColor} mb-2">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="alert-heading">${rec.type}</h6>
-                                <p class="mb-1">${rec.message}</p>
-                                <strong>Action:</strong> ${rec.action}
-                            </div>
-                            <span class="badge bg-${priorityColor}">${rec.priority.toUpperCase()}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        } else {
-            html += `
-                <div class="alert alert-success">
-                    <h6 class="alert-heading">Great!</h6>
-                    <p class="mb-0">Your soil conditions are optimal. No immediate action required.</p>
-                </div>
-            `;
-        }
-
-        html += `
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-function loadHistory() {
-    const startDate = document.getElementById('startDate')?.value || '';
-    const endDate = document.getElementById('endDate')?.value || '';
-    const deviceId = document.getElementById('historyDeviceFilter')?.value || '';
-
-    const params = new URLSearchParams();
-    if (startDate) params.append('start_date', startDate);
-    if (endDate) params.append('end_date', endDate);
-    if (deviceId) params.append('device_id', deviceId);
-
-    document.getElementById('historyContent').innerHTML = `
-        <div class="text-center py-4">
-            <div class="spinner-border text-warning" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Loading history...</p>
-        </div>
-    `;
-
-    fetch(`{{ route('farmer.soil.history') }}?${params.toString()}`, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            renderHistory(data.data);
-        } else {
-            throw new Error(data.message || 'Failed to load history');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('historyContent').innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Error loading history: ${error.message}
-            </div>
-        `;
-    });
-}
-
-function renderHistory(data) {
-    const container = document.getElementById('historyContent');
-
-    if (!data || data.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-4">
-                <i class="fas fa-history fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No history found</h5>
-                <p class="text-muted">No soil data found for the selected criteria.</p>
-            </div>
-        `;
-        return;
-    }
-
+function renderLiveData(data, season) {
     let html = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6>Current Season: <span class="season-badge">${season || 'Unknown'}</span></h6>
+            <small class="text-muted">${data ? data.length : 0} readings from my devices</small>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th>Date/Time</th>
-                        <th>Device</th>
-                        <th>Farm</th>
-                        <th>pH</th>
+                        <th>My Device</th>
+                        <th>My Farm</th>
+                        <th>pH Level</th>
                         <th>Moisture</th>
                         <th>Temperature</th>
                         <th>Health Score</th>
-                        <th>Status</th>
+                        <th>Recorded</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
-    data.forEach(reading => {
+    if (!data || data.length === 0) {
         html += `
             <tr>
-                <td>${new Date(reading.created_at).toLocaleString()}</td>
-                <td>${reading.device ? reading.device.name : 'N/A'}</td>
-                <td>${reading.farm ? reading.farm.name : 'N/A'}</td>
-                <td>${reading.ph}</td>
-                <td>${reading.moisture}%</td>
-                <td>${reading.temperature}°C</td>
-                <td>${reading.soil_health_score}%</td>
-                <td><span class="badge bg-${reading.health_color}">${reading.health_status}</span></td>
+                <td colspan="7" class="text-center text-muted py-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No live data available from your devices.
+                    <button onclick="generateDemoData()" class="btn btn-sm btn-outline-primary ms-1">Generate Demo Data</button>
+                    to create sample readings.
+                </td>
             </tr>
         `;
-    });
-
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = html;
-}
-
-function loadAnalytics() {
-    fetch('{{ route('farmer.soil.analytics') }}', {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            renderAnalytics(data.charts);
-        } else {
-            throw new Error(data.message || 'Failed to load analytics');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-function renderAnalytics(charts) {
-    // Implement chart rendering using Chart.js
-    // This would require the charts data to be processed and rendered
-    console.log('Analytics data:', charts);
-}
-
-// Auto-refresh live data every 5 minutes
-setInterval(() => {
-    if (currentSection === 'liveData') {
-        loadLiveData();
+    } else {
+        data.forEach(item => {
+            const health = getHealthStatus(item.soil_health_score);
+            html += `
+                <tr>
+                    <td>
+                        <div class="fw-bold">${item.device ? item.device.device_name : 'Unknown Device'}</div>
+                        <small class="text-muted">${item.device ? item.device.device_serial_number : 'N/A'}</small>
+                    </td>
+                    <td>${item.farm ? item.farm.name : 'N/A'}</td>
+                    <td><span class="badge bg-info">${item.ph_level || 'N/A'}</span></td>
+                    <td><span class="badge bg-primary">${item.moisture_level ? item.moisture_level + '%' : 'N/A'}</span></td>
+                    <td><span class="badge bg-warning">${item.temperature ? item.temperature + '°C' : 'N/A'}</span></td>
+                    <td>
+                        <span class="badge bg-${getHealthColor(health)}">${health}</span>
+                        <small class="d-block text-muted">${item.soil_health_score || 0}%</small>
+                    </td>
+                    <td><small>${new Date(item.recorded_at).toLocaleString()}</small></td>
+                </tr>
+            `;
+        });
     }
-}, 300000);
+
+    html += '</tbody></table></div>';
+    document.getElementById('liveDataContent').innerHTML = html;
+}
+
+function getHealthStatus(score) {
+    if (!score && score !== 0) return 'unknown';
+    score = parseFloat(score);
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    if (score >= 40) return 'fair';
+    return 'poor';
+}
+
+function getHealthColor(health) {
+    switch(health) {
+        case 'excellent': return 'success';
+        case 'good': return 'info';
+        case 'fair': return 'warning';
+        case 'poor': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+function generateDemoData() {
+    Swal.fire({
+        title: 'Generate Demo Data?',
+        text: 'This will create sample soil readings for your devices for testing purposes.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, generate data',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Generating...',
+                text: 'Creating demo soil data for your farms...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => Swal.showLoading()
+            });
+
+            fetch('/farmer/soil/generate-demo-data', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.close();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message || 'Demo data generated successfully for your farms!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        loadLiveData();
+                        loadInitialData();
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to generate demo data', 'error');
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                console.error('Error:', error);
+                Swal.fire('Error', 'Failed to generate demo data: ' + error.message, 'error');
+            });
+        }
+    });
+}
 </script>
 @endsection

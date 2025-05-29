@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class FarmerMiddleware
 {
     /**
      * Handle an incoming request.
@@ -20,8 +20,8 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id != 4) { // System Admin role
-            return redirect()->route('farmer.dashboard');
+        if (Auth::user()->role_id != 1) {
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);
