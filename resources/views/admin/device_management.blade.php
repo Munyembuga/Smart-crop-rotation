@@ -3,6 +3,8 @@
 @section('title', 'Device Management - Admin Dashboard')
 
 @section('styles')
+<!-- Add CSRF token meta tag -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- Font Awesome -->
@@ -10,7 +12,7 @@
 <!-- Custom styles -->
 <style>
     .modal-header {
-        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        background: #0ac15e;
         color: white;
     }
     .modal-header .btn-close {
@@ -351,20 +353,12 @@ let users = [];
 // Add CSRF token to all requests
 function getCSRFToken() {
     const token = document.querySelector('meta[name="csrf-token"]');
-    return token ? token.getAttribute('content') : '';
+    return token ? token.getAttribute('content') : '{{ csrf_token() }}';
 }
 
 // Load devices on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadDevices();
-
-    // Add CSRF token to meta tag if it doesn't exist
-    if (!document.querySelector('meta[name="csrf-token"]')) {
-        const meta = document.createElement('meta');
-        meta.name = 'csrf-token';
-        meta.content = '{{ csrf_token() }}';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-    }
 });
 
 function loadDevices() {
@@ -383,7 +377,7 @@ function loadDevices() {
         return response.json();
     })
     .then(data => {
-        console.log('Loaded data:', data); // Debug log
+        console.log('Loaded data:', data);
 
         if (data.devices) {
             renderDevicesTable(data.devices);
@@ -391,7 +385,6 @@ function loadDevices() {
         if (data.users) {
             users = data.users;
             populateUserSelect();
-            console.log('Users loaded:', users); // Debug log
         }
     })
     .catch(error => {
@@ -549,7 +542,8 @@ function editDevice(deviceId) {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
         }
     })
     .then(response => {
@@ -613,7 +607,8 @@ function viewDevice(deviceId) {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
         }
     })
     .then(response => {
@@ -735,7 +730,8 @@ function deleteDevice(deviceId) {
         headers: {
             'X-CSRF-TOKEN': getCSRFToken(),
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         }
     })
     .then(response => {
@@ -753,7 +749,7 @@ function deleteDevice(deviceId) {
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
-                loadDevices(); // Reload the table
+                loadDevices();
             });
         } else {
             throw new Error(data.message || 'Failed to delete device');
@@ -769,7 +765,7 @@ function deleteDevice(deviceId) {
     });
 }
 
-// Form submission
+// Form submission - FIXED VERSION
 document.getElementById('deviceForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -782,43 +778,68 @@ document.getElementById('deviceForm').addEventListener('submit', function(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
     submitBtn.disabled = true;
 
-    const formData = new FormData(this);
+    // Create FormData object
+    const formData = new FormData();
 
-    // Collect sensor types
+    // Add all form fields
+    const formFields = ['device_serial_number', 'device_name', 'device_type', 'user_id',
+                       'installation_location', 'farm_upi', 'status', 'latitude', 'longitude',
+                       'firmware_version', 'battery_level', 'notes'];
+
+    formFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (element && element.value) {
+            formData.append(field, element.value);
+        }
+    });
+
+    // Handle sensor types array
     const sensorTypes = [];
     document.querySelectorAll('input[name="sensor_types[]"]:checked').forEach(cb => {
         sensorTypes.push(cb.value);
     });
 
-    // Remove the individual checkboxes and add as array
-    formData.delete('sensor_types[]');
-    sensorTypes.forEach(sensor => {
-        formData.append('sensor_types[]', sensor);
-    });
+    // Add sensor types as JSON string for better handling
+    if (sensorTypes.length > 0) {
+        formData.append('sensor_types', JSON.stringify(sensorTypes));
+    }
 
-    const url = isEditing ? `/admin/devices/${currentDeviceId}` : '/admin/devices';
+    // Add CSRF token
+    formData.append('_token', getCSRFToken());
 
+    // Add method for updates
     if (isEditing) {
         formData.append('_method', 'PUT');
     }
+
+    const url = isEditing ? `/admin/devices/${currentDeviceId}` : '/admin/devices';
 
     fetch(url, {
         method: 'POST',
         body: formData,
         headers: {
             'X-CSRF-TOKEN': getCSRFToken(),
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         }
     })
     .then(response => {
+        console.log('Response status:', response.status);
         if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.message || `HTTP error! status: ${response.status}`);
+            return response.text().then(text => {
+                console.log('Error response:', text);
+                try {
+                    const data = JSON.parse(text);
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                } catch (e) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${text}`);
+                }
             });
         }
         return response.json();
     })
     .then(data => {
+        console.log('Success response:', data);
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
 
@@ -846,6 +867,11 @@ document.getElementById('deviceForm').addEventListener('submit', function(e) {
                             feedback.textContent = data.errors[field][0];
                         }
                     }
+                });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please check the form fields and try again.'
                 });
             } else {
                 throw new Error(data.message || 'Validation failed');

@@ -14,20 +14,17 @@ class Device extends Model
         'device_name',
         'device_type',
         'user_id',
-        'farm_id',
         'installation_location',
         'farm_upi',
-        'sensor_types',
+        'status',
         'latitude',
         'longitude',
-        'notes',
         'firmware_version',
-        'status',
         'battery_level',
-        'assigned_by',
+        'sensor_types',
+        'notes',
         'installed_at',
-        'last_reading_at',
-        'last_maintenance_at'
+        'last_communication'
     ];
 
     protected $casts = [
@@ -36,8 +33,12 @@ class Device extends Model
         'longitude' => 'decimal:8',
         'battery_level' => 'integer',
         'installed_at' => 'datetime',
-        'last_reading_at' => 'datetime',
-        'last_maintenance_at' => 'datetime'
+        'last_communication' => 'datetime'
+    ];
+
+    protected $dates = [
+        'installed_at',
+        'last_communication'
     ];
 
     /**
@@ -49,97 +50,33 @@ class Device extends Model
     }
 
     /**
-     * Get the admin who assigned this device
-     */
-    public function assignedBy()
-    {
-        return $this->belongsTo(User::class, 'assigned_by');
-    }
-
-    /**
-     * Get the farm that the device is installed in
-     */
-    public function farm()
-    {
-        return $this->belongsTo(Farm::class);
-    }
-
-    /**
-     * Get the soil data readings from this device
-     */
-    public function soilData()
-    {
-        return $this->hasMany(SoilData::class);
-    }
-
-    /**
-     * Get the latest soil data reading
-     */
-    public function latestReading()
-    {
-        return $this->hasOne(SoilData::class)->latestOfMany();
-    }
-
-    /**
-     * Get status badge color
-     */
-    public function getStatusColorAttribute()
-    {
-        switch ($this->status) {
-            case 'active': return 'success';
-            case 'inactive': return 'warning';
-            case 'maintenance': return 'info';
-            case 'offline': return 'danger';
-            default: return 'secondary';
-        }
-    }
-
-    /**
-     * Get battery level status
-     */
-    public function getBatteryStatusAttribute()
-    {
-        if (!$this->battery_level) return 'unknown';
-
-        if ($this->battery_level >= 80) return 'excellent';
-        if ($this->battery_level >= 50) return 'good';
-        if ($this->battery_level >= 20) return 'low';
-        return 'critical';
-    }
-
-    /**
-     * Get battery color based on level
-     */
-    public function getBatteryColorAttribute()
-    {
-        if (!$this->battery_level) return 'secondary';
-
-        if ($this->battery_level >= 80) return 'success';
-        if ($this->battery_level >= 50) return 'info';
-        if ($this->battery_level >= 20) return 'warning';
-        return 'danger';
-    }
-
-    /**
-     * Check if device is online
+     * Check if device is online (communicated within last 30 minutes)
      */
     public function isOnline()
     {
-        return $this->status === 'active' &&
-               $this->last_reading_at &&
-               $this->last_reading_at->diffInMinutes(now()) <= 60;
+        if (!$this->last_communication) {
+            return false;
+        }
+
+        return $this->last_communication->gt(now()->subMinutes(30));
     }
 
     /**
-     * Get formatted sensor types
+     * Get battery status color
      */
-    public function getFormattedSensorTypesAttribute()
+    public function getBatteryStatusAttribute()
     {
-        if (!$this->sensor_types || !is_array($this->sensor_types)) {
-            return 'No sensors';
+        if ($this->battery_level === null) {
+            return 'secondary';
         }
 
-        return implode(', ', $this->sensor_types);
+        if ($this->battery_level >= 70) {
+            return 'success';
+        } elseif ($this->battery_level >= 30) {
+            return 'warning';
+        } else {
+            return 'danger';
+        }
     }
 
     /**
@@ -151,18 +88,10 @@ class Device extends Model
     }
 
     /**
-     * Scope for devices by user
+     * Scope for online devices
      */
-    public function scopeByUser($query, $userId)
+    public function scopeOnline($query)
     {
-        return $query->where('user_id', $userId);
-    }
-
-    /**
-     * Scope for devices by farm
-     */
-    public function scopeByFarm($query, $farmId)
-    {
-        return $query->where('farm_id', $farmId);
+        return $query->where('last_communication', '>', now()->subMinutes(30));
     }
 }
