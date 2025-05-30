@@ -396,12 +396,15 @@ function getCSRFToken() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, starting initialization...');
     loadInitialData();
     loadFilters();
     showSection('liveData');
 });
 
 function loadInitialData() {
+    console.log('Loading initial data...');
+
     fetch('/farmer/soil/analytics', {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -410,18 +413,28 @@ function loadInitialData() {
         }
     })
     .then(response => {
+        console.log('Analytics response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Analytics data received:', data);
         if (data.success) {
             document.getElementById('totalDevices').textContent = data.stats.total_devices || 0;
             document.getElementById('totalFarms').textContent = data.stats.total_farms || 0;
             document.getElementById('totalReadings').textContent = data.stats.total_readings || 0;
             document.getElementById('healthScore').textContent = Math.round(data.stats.avg_health_score || 0) + '%';
             document.getElementById('currentSeason').textContent = data.season || 'Current Season';
+
+            // Show helpful message if no data
+            if (data.stats.total_devices === 0) {
+                showNoDataMessage();
+            }
+        } else {
+            console.error('Analytics API returned error:', data.message);
+            showErrorMessage(data.message);
         }
     })
     .catch(error => {
@@ -431,10 +444,50 @@ function loadInitialData() {
         document.getElementById('totalReadings').textContent = '0';
         document.getElementById('healthScore').textContent = '0%';
         document.getElementById('currentSeason').textContent = 'Current Season';
+        showErrorMessage('Failed to load data: ' + error.message);
     });
 }
 
+function showNoDataMessage() {
+    const quickStats = document.getElementById('quickStats');
+    if (quickStats) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'col-12 mb-3';
+        alertDiv.innerHTML = `
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Welcome to your Soil Management Dashboard!</strong>
+                You don't have any devices or farms set up yet.
+                <button type="button" class="btn btn-primary btn-sm ms-2" onclick="generateDemoData()">
+                    <i class="fas fa-plus me-1"></i>Create Demo Setup
+                </button>
+                to get started.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        quickStats.parentNode.insertBefore(alertDiv, quickStats);
+    }
+}
+
+function showErrorMessage(message) {
+    const quickStats = document.getElementById('quickStats');
+    if (quickStats) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'col-12 mb-3';
+        alertDiv.innerHTML = `
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Data Loading Issue:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        quickStats.parentNode.insertBefore(alertDiv, quickStats);
+    }
+}
+
 function loadFilters() {
+    console.log('Loading filters...');
+
     fetch('/farmer/soil/filters', {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -443,25 +496,31 @@ function loadFilters() {
         }
     })
     .then(response => {
+        console.log('Filters response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Filters data received:', data);
         if (data.success) {
             filters = data;
             populateFilters();
+        } else {
+            console.error('Filters API returned error:', data.message);
         }
     })
     .catch(error => {
         console.error('Error loading filters:', error);
-        filters = { devices: [], farms: [], seasons: ['Season A', 'Season B'] };
+        filters = { devices: [], farms: [], seasons: ['Season A', 'Season B', 'Season C'] };
         populateFilters();
     });
 }
 
 function populateFilters() {
+    console.log('Populating filters with data:', filters);
+
     const deviceSelect = document.getElementById('deviceFilter');
     if (deviceSelect) {
         deviceSelect.innerHTML = '<option value="">All My Devices</option>';
@@ -469,7 +528,7 @@ function populateFilters() {
             filters.devices.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.id;
-                option.textContent = `${device.device_name || device.name}`;
+                option.textContent = `${device.device_name || device.name} (${device.device_type || 'Sensor'})`;
                 deviceSelect.appendChild(option);
             });
         }
@@ -487,6 +546,19 @@ function populateFilters() {
             });
         }
     }
+
+    const seasonSelect = document.getElementById('seasonFilter');
+    if (seasonSelect) {
+        seasonSelect.innerHTML = '<option value="">All Seasons</option>';
+        if (filters.seasons && filters.seasons.length > 0) {
+            filters.seasons.forEach(season => {
+                const option = document.createElement('option');
+                option.value = season;
+                option.textContent = season;
+                seasonSelect.appendChild(option);
+            });
+        }
+    }
 }
 
 function showSoilModal() {
@@ -500,6 +572,7 @@ function hideSoilModal() {
 }
 
 function showSection(section) {
+    console.log('Showing section:', section);
     hideSoilModal();
 
     document.querySelectorAll('.content-section').forEach(el => {
@@ -515,11 +588,22 @@ function showSection(section) {
             case 'liveData':
                 loadLiveData();
                 break;
+            case 'recommendations':
+                loadRecommendations();
+                break;
+            case 'history':
+                loadHistory();
+                break;
+            case 'analytics':
+                loadAnalytics();
+                break;
         }
     }
 }
 
 function loadLiveData() {
+    console.log('Loading live data...');
+
     const deviceId = document.getElementById('deviceFilter')?.value || '';
     const farmId = document.getElementById('farmFilter')?.value || '';
 
@@ -544,12 +628,14 @@ function loadLiveData() {
         }
     })
     .then(response => {
+        console.log('Live data response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Live data received:', data);
         if (data.success) {
             renderLiveData(data.data, data.season);
         } else {
@@ -563,13 +649,17 @@ function loadLiveData() {
                 <i class="fas fa-exclamation-triangle me-2"></i>
                 <strong>No data available yet:</strong> ${error.message}
                 <br><small>You don't have any devices set up or soil data recorded yet.</small>
-                <button onclick="generateDemoData()" class="btn btn-sm btn-primary ms-2">Generate Demo Data</button>
+                <br><button onclick="generateDemoData()" class="btn btn-sm btn-primary mt-2">
+                    <i class="fas fa-plus me-1"></i>Create Demo Setup & Data
+                </button>
             </div>
         `;
     });
 }
 
 function renderLiveData(data, season) {
+    console.log('Rendering live data:', data);
+
     let html = `
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6>Current Season: <span class="season-badge">${season || 'Unknown'}</span></h6>
@@ -584,6 +674,7 @@ function renderLiveData(data, season) {
                         <th>pH Level</th>
                         <th>Moisture</th>
                         <th>Temperature</th>
+                        <th>NPK</th>
                         <th>Health Score</th>
                         <th>Recorded</th>
                     </tr>
@@ -594,11 +685,12 @@ function renderLiveData(data, season) {
     if (!data || data.length === 0) {
         html += `
             <tr>
-                <td colspan="7" class="text-center text-muted py-4">
+                <td colspan="8" class="text-center text-muted py-4">
                     <i class="fas fa-info-circle me-2"></i>
                     No live data available from your devices.
-                    <button onclick="generateDemoData()" class="btn btn-sm btn-outline-primary ms-1">Generate Demo Data</button>
-                    to create sample readings.
+                    <br><button onclick="generateDemoData()" class="btn btn-sm btn-outline-primary mt-2">
+                        <i class="fas fa-plus me-1"></i>Create Demo Setup & Data
+                    </button>
                 </td>
             </tr>
         `;
@@ -611,10 +703,20 @@ function renderLiveData(data, season) {
                         <div class="fw-bold">${item.device ? item.device.device_name : 'Unknown Device'}</div>
                         <small class="text-muted">${item.device ? item.device.device_serial_number : 'N/A'}</small>
                     </td>
-                    <td>${item.farm ? item.farm.name : 'N/A'}</td>
+                    <td>
+                        <div class="fw-bold">${item.farm ? item.farm.name : 'N/A'}</div>
+                        <small class="text-muted">${item.farm ? item.farm.location : ''}</small>
+                    </td>
                     <td><span class="badge bg-info">${item.ph_level || 'N/A'}</span></td>
                     <td><span class="badge bg-primary">${item.moisture_level ? item.moisture_level + '%' : 'N/A'}</span></td>
                     <td><span class="badge bg-warning">${item.temperature ? item.temperature + '°C' : 'N/A'}</span></td>
+                    <td>
+                        <small>
+                            N:${item.nitrogen || 0}<br>
+                            P:${item.phosphorus || 0}<br>
+                            K:${item.potassium || 0}
+                        </small>
+                    </td>
                     <td>
                         <span class="badge bg-${getHealthColor(health)}">${health}</span>
                         <small class="d-block text-muted">${item.soil_health_score || 0}%</small>
@@ -627,6 +729,316 @@ function renderLiveData(data, season) {
 
     html += '</tbody></table></div>';
     document.getElementById('liveDataContent').innerHTML = html;
+}
+
+function loadRecommendations() {
+    document.getElementById('recommendationsContent').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-info" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading my recommendations...</p>
+        </div>
+    `;
+
+    fetch('/farmer/soil/recommendations', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            renderRecommendations(data.data, data.season);
+        } else {
+            throw new Error(data.message || 'Failed to load recommendations');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading recommendations:', error);
+        document.getElementById('recommendationsContent').innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No recommendations available yet. Recommendations will be generated automatically as soil data is collected from your devices.
+            </div>
+        `;
+    });
+}
+
+function renderRecommendations(data, season) {
+    let html = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6>Recommendations for My Farms - Season: <span class="season-badge">${season || 'Unknown'}</span></h6>
+            <small class="text-muted">${data ? data.length : 0} recommendations</small>
+        </div>
+    `;
+
+    if (!data || data.length === 0) {
+        html += `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No recommendations available for my current season.
+                <br><small>Recommendations will be generated automatically as soil data is collected from my devices.</small>
+            </div>
+        `;
+    } else {
+        data.forEach(item => {
+            html += `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title">
+                                    <i class="fas fa-seedling me-2"></i>${item.recommended_crop}
+                                    <span class="badge bg-${getPriorityColor(item.priority)} ms-2">${item.priority}</span>
+                                </h6>
+                                <p class="card-text">${item.recommendation_details}</p>
+                                <small class="text-muted">
+                                    For My Farm: ${item.farm ? item.farm.name : 'Unknown'} |
+                                    Confidence: ${item.confidence_score}% |
+                                    Created: ${new Date(item.created_at).toLocaleDateString()}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="progress" style="width: 100px; height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: ${item.confidence_score}%"></div>
+                                </div>
+                                <small class="text-muted">${item.confidence_score}%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById('recommendationsContent').innerHTML = html;
+}
+
+function loadHistory() {
+    const startDate = document.getElementById('startDate')?.value;
+    const endDate = document.getElementById('endDate')?.value;
+    const season = document.getElementById('seasonFilter')?.value;
+
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    if (season) params.append('season', season);
+
+    document.getElementById('historyContent').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-warning" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading my historical data...</p>
+        </div>
+    `;
+
+    fetch(`/farmer/soil/history?${params}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            renderHistory(data.data);
+        } else {
+            throw new Error(data.message || 'Failed to load history');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading history:', error);
+        document.getElementById('historyContent').innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No historical data found for my farms in the selected criteria.
+            </div>
+        `;
+    });
+}
+
+function renderHistory(data) {
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>My Device</th>
+                        <th>My Farm</th>
+                        <th>pH</th>
+                        <th>Moisture</th>
+                        <th>Temperature</th>
+                        <th>NPK</th>
+                        <th>Health Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if (!data || data.length === 0) {
+        html += `
+            <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No historical data found for my farms in selected criteria
+                </td>
+            </tr>
+        `;
+    } else {
+        data.forEach(item => {
+            html += `
+                <tr>
+                    <td><small>${new Date(item.created_at).toLocaleDateString()}</small></td>
+                    <td>${item.device ? (item.device.device_name || item.device.name) : 'Unknown Device'}</td>
+                    <td>${item.farm ? item.farm.name : 'N/A'}</td>
+                    <td><span class="badge bg-info">${item.ph_level || 'N/A'}</span></td>
+                    <td><span class="badge bg-primary">${item.moisture_level ? item.moisture_level + '%' : 'N/A'}</span></td>
+                    <td><span class="badge bg-warning">${item.temperature ? item.temperature + '°C' : 'N/A'}</span></td>
+                    <td>
+                        <small>
+                            N:${item.nitrogen || '-'}<br>
+                            P:${item.phosphorus || '-'}<br>
+                            K:${item.potassium || '-'}
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge bg-${getHealthColorFromScore(item.soil_health_score)}">${item.soil_health_score || 0}%</span>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    html += '</tbody></table></div>';
+    document.getElementById('historyContent').innerHTML = html;
+}
+
+function loadAnalytics() {
+    fetch('/farmer/soil/analytics', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': getCSRFToken()
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            renderCharts(data);
+        } else {
+            console.error('Analytics failed:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading analytics:', error);
+    });
+}
+
+function renderCharts(data) {
+    try {
+        // Health Distribution Chart
+        const healthCtx = document.getElementById('healthChart')?.getContext('2d');
+        if (healthCtx) {
+            if (window.healthChart instanceof Chart) {
+                window.healthChart.destroy();
+            }
+
+            window.healthChart = new Chart(healthCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.health_distribution ? data.health_distribution.map(item => item.health_status) : [],
+                    datasets: [{
+                        data: data.health_distribution ? data.health_distribution.map(item => item.count) : [],
+                        backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'My Soil Health Distribution'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Trends Chart
+        const trendsCtx = document.getElementById('trendsChart')?.getContext('2d');
+        if (trendsCtx) {
+            if (window.trendsChart instanceof Chart) {
+                window.trendsChart.destroy();
+            }
+
+            window.trendsChart = new Chart(trendsCtx, {
+                type: 'line',
+                data: {
+                    labels: data.trends ? data.trends.map(item => item.date) : [],
+                    datasets: [
+                        {
+                            label: 'pH Level',
+                            data: data.trends ? data.trends.map(item => item.avg_ph) : [],
+                            borderColor: '#2c5530',
+                            backgroundColor: 'rgba(44, 85, 48, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Moisture %',
+                            data: data.trends ? data.trends.map(item => item.avg_moisture) : [],
+                            borderColor: '#17a2b8',
+                            backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Temperature °C',
+                            data: data.trends ? data.trends.map(item => item.avg_temperature) : [],
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'My Soil Trends (Last 30 Days)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error rendering charts:', error);
+    }
 }
 
 function getHealthStatus(score) {
@@ -648,19 +1060,46 @@ function getHealthColor(health) {
     }
 }
 
+function getHealthColorFromScore(score) {
+    if (!score && score !== 0) return 'secondary';
+    score = parseFloat(score);
+    if (score >= 80) return 'success';
+    if (score >= 60) return 'info';
+    if (score >= 40) return 'warning';
+    return 'danger';
+}
+
+function getPriorityColor(priority) {
+    switch(priority) {
+        case 'high': return 'danger';
+        case 'medium': return 'warning';
+        case 'low': return 'info';
+        default: return 'secondary';
+    }
+}
+
 function generateDemoData() {
     Swal.fire({
-        title: 'Generate Demo Data?',
-        text: 'This will create sample soil readings for your devices for testing purposes.',
+        title: 'Create Demo Setup?',
+        html: `
+            <p>This will create:</p>
+            <ul class="text-start">
+                <li>1 Demo Farm for your account</li>
+                <li>1 Demo Soil Sensor device</li>
+                <li>20 Sample soil readings</li>
+            </ul>
+            <p>This is for testing and demonstration purposes.</p>
+        `,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Yes, generate data',
-        cancelButtonText: 'Cancel'
+        confirmButtonText: 'Yes, create demo setup',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#2c5530'
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                title: 'Generating...',
-                text: 'Creating demo soil data for your farms...',
+                title: 'Creating Demo Setup...',
+                text: 'Setting up your demo farm, device, and soil data...',
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 willOpen: () => Swal.showLoading()
@@ -681,25 +1120,36 @@ function generateDemoData() {
                 if (data.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Success!',
-                        text: data.message || 'Demo data generated successfully for your farms!',
-                        timer: 2000,
-                        showConfirmButton: false
+                        title: 'Demo Setup Created!',
+                        text: data.message || 'Demo setup created successfully!',
+                        timer: 3000,
+                        showConfirmButton: false,
+                        confirmButtonColor: '#2c5530'
                     }).then(() => {
-                        loadLiveData();
+                        // Reload all data
                         loadInitialData();
+                        loadFilters();
+                        loadLiveData();
                     });
                 } else {
-                    Swal.fire('Error', data.message || 'Failed to generate demo data', 'error');
+                    Swal.fire('Error', data.message || 'Failed to create demo setup', 'error');
                 }
             })
             .catch(error => {
                 Swal.close();
                 console.error('Error:', error);
-                Swal.fire('Error', 'Failed to generate demo data: ' + error.message, 'error');
+                Swal.fire('Error', 'Failed to create demo setup: ' + error.message, 'error');
             });
         }
     });
 }
+
+// Add auto-refresh for live data every 30 seconds
+setInterval(() => {
+    if (currentSection === 'liveData') {
+        console.log('Auto-refreshing live data...');
+        loadLiveData();
+    }
+}, 30000);
 </script>
 @endsection

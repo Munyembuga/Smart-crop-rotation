@@ -54,8 +54,8 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);">
-                    <h3 class="mb-0"><i class="fas fa-microchip me-2"></i>Device Management</h3>
+                <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center" style="background:white">
+                    <h3 class="mb-0" style="color:black">Device Management</h3>
                     <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#deviceModal" onclick="openCreateModal()">
                         <i class="fas fa-plus me-2"></i>Add New Device
                     </button>
@@ -71,17 +71,19 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-striped" id="devicesTable">
-                            <thead class="table-dark">
+<thead style="background-color: #343a40; color: white;">
                                 <tr>
-                                    <th><i class="fas fa-microchip me-1"></i>Device</th>
-                                    <th><i class="fas fa-barcode me-1"></i>Serial Number</th>
-                                    <th><i class="fas fa-user me-1"></i>Assigned User</th>
-                                    <th><i class="fas fa-map-marker-alt me-1"></i>Location</th>
-                                    <th><i class="fas fa-seedling me-1"></i>Farm UPI</th>
-                                    <th><i class="fas fa-circle me-1"></i>Status</th>
-                                    <th><i class="fas fa-battery-half me-1"></i>Battery</th>
-                                    <th><i class="fas fa-wifi me-1"></i>Online</th>
-                                    <th><i class="fas fa-calendar me-1"></i>Installed</th>
+                                    <th>Device</th>
+                                    <th>Serial Number</th>
+                                    <th>Assigned User</th>
+                                    <th>Location</th>
+                                    <!-- <th><i class="fas fa-seedling me-1"></i>Farm UPI</th> -->
+                                    <!-- <th><i class="fas fa-circle me-1"></i>Status</th> -->
+
+                                    <!-- <th><i class="fas fa-battery-half me-1"></i>Battery</th> -->
+                                    <!-- <th><i class="fas fa-wifi me-1"></i>Online</th> -->
+
+                                    <!-- <th><i class="fas fa-calendar me-1"></i>Installed</th> -->
                                     <th><i class="fas fa-cogs me-1"></i>Actions</th>
                                 </tr>
                             </thead>
@@ -450,15 +452,13 @@ function renderDevicesTable(devices) {
         const isOnline = device.last_communication &&
             new Date(device.last_communication) > new Date(Date.now() - 30 * 60 * 1000);
 
-        const batteryColor = device.battery_level ?
-            (device.battery_level >= 70 ? 'success' : device.battery_level >= 30 ? 'warning' : 'danger') : 'secondary';
+        // const batteryColor = device.battery_level ?
+        //     (device.battery_level >= 70 ? 'success' : device.battery_level >= 30 ? 'warning' : 'danger') : 'secondary';
 
         row.innerHTML = `
             <td>
                 <div class="d-flex align-items-center">
-                    <div class="device-avatar rounded-circle d-flex align-items-center justify-content-center me-2">
-                        <i class="fas fa-microchip text-white"></i>
-                    </div>
+
                     <div>
                         <div class="fw-bold">${device.device_name}</div>
                         <small class="text-muted">${device.device_type}</small>
@@ -473,36 +473,8 @@ function renderDevicesTable(devices) {
                 </div>
             </td>
             <td><span class="badge bg-info">${device.installation_location}</span></td>
-            <td>
-                ${device.farm_upi ?
-                    `<span class="badge bg-success">${device.farm_upi}</span>` :
-                    '<span class="text-muted">Not set</span>'
-                }
-            </td>
-            <td>
-                <span class="badge status-${device.status} rounded-pill">
-                    <i class="fas fa-circle me-1" style="font-size: 0.6em;"></i>
-                    ${device.status.charAt(0).toUpperCase() + device.status.slice(1)}
-                </span>
-            </td>
-            <td>
-                ${device.battery_level !== null ?
-                    `<div class="d-flex align-items-center">
-                        <div class="progress battery-indicator me-2">
-                            <div class="progress-bar bg-${batteryColor}" style="width: ${device.battery_level}%"></div>
-                        </div>
-                        <small>${device.battery_level}%</small>
-                    </div>` :
-                    '<span class="text-muted">N/A</span>'
-                }
-            </td>
-            <td>
-                <span class="online-indicator ${isOnline ? 'online' : 'offline'}"></span>
-                ${isOnline ? 'Online' : 'Offline'}
-            </td>
-            <td>
-                <small>${device.installed_at ? new Date(device.installed_at).toLocaleDateString() : 'Not set'}</small>
-            </td>
+
+
             <td>
                 <div class="btn-group" role="group" aria-label="Device actions">
                     <button type="button" class="btn btn-outline-info btn-sm"

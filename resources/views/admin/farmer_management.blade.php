@@ -57,15 +57,14 @@
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-striped" id="farmersTable">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th><i class="fas fa-user me-1"></i>Name</th>
-                                    <th><i class="fas fa-envelope me-1"></i>Email</th>
-                                    <th><i class="fas fa-phone me-1"></i>Phone</th>
-                                    <th><i class="fas fa-map-marker-alt me-1"></i>Location</th>
-                                    <th><i class="fas fa-circle me-1"></i>Status</th>
-                                    <th><i class="fas fa-calendar me-1"></i>Registered</th>
-                                    <th><i class="fas fa-cogs me-1"></i>Actions</th>
+<thead style="background-color: #343a40; color: black;font-weight:boldd">                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="farmersTableBody">
@@ -277,9 +276,7 @@ function renderFarmersTable(farmers) {
         row.innerHTML = `
             <td>
                 <div class="d-flex align-items-center">
-                    <div class="farmer-avatar rounded-circle d-flex align-items-center justify-content-center me-2">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
+
                     <div>
                         <div class="fw-bold">${farmer.name || 'N/A'}</div>
                         <small class="text-muted">${farmer.username || 'N/A'}</small>

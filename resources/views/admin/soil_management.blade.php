@@ -106,7 +106,7 @@
     }
 
     .season-badge {
-        background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+        background:#0ac15e;
         color: white;
         padding: 4px 12px;
         border-radius: 20px;
@@ -142,8 +142,8 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);">
-                    <h3 class="mb-0"><i class="fas fa-seedling me-2"></i>Soil Management Dashboard</h3>
+                <div class="card-header text-black d-flex justify-content-between align-items-center" >
+                    <h3 class="mb-0">Soil Management Dashboard</h3>
                     <div>
                         <span class="season-badge me-2" id="currentSeason">Loading...</span>
                         <button type="button" class="btn btn-light btn-sm" onclick="showSoilModal()">

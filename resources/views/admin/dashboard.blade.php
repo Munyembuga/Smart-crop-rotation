@@ -26,12 +26,11 @@
     }
 
     .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px;
+        background: white,
+        border-radius: 10px;
         padding: 20px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #8B4513;
     }
 
     .stat-card:hover {
@@ -40,18 +39,18 @@
     }
 
     .stat-card.green {
-        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        background:white,
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .stat-card.orange {
-        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-        box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        background:white,
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .stat-card.red {
-        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        background:white,
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .quick-action-btn {
@@ -76,10 +75,10 @@
     }
 
     .welcome-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: white;
+        color: black;
         border-radius: 15px;
-        padding: 30px;
+        padding: 15px;
         margin-bottom: 30px;
     }
 
@@ -107,25 +106,17 @@
 @section('content')
 <div class="container-fluid">
     <!-- Welcome Section -->
-    <div class="welcome-section">
+    <!-- <div class="welcome-section">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h2 class="mb-2">
-                    <i class="fas fa-shield-alt me-2"></i>
-                    Welcome, System Administrator!
-                </h2>
-                <p class="mb-0 opacity-75">
-                    Manage users, monitor system health, and oversee the Smart Crop Rotation System.
-                </p>
-            </div>
-            <div class="col-md-4 text-end">
+
+
                 <div class="text-white">
                     <h5 class="mb-1">Current Season</h5>
                     <span class="badge bg-light text-dark px-3 py-2">{{ date('Y') }}{{ date('n') <= 6 ? 'A' : 'B' }}</span>
                 </div>
-            </div>
+
         </div>
-    </div>
+    </div> -->
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
@@ -397,20 +388,20 @@ function initializeCharts() {
 
     // Registration Trend Chart (Last 7 days)
     const registrationCtx = document.getElementById('registrationChart').getContext('2d');
-    
+
     // Generate last 7 days data
     const last7Days = [];
     const registrationData = [];
-    
+
     for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         last7Days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
+
         // This would ideally come from a proper query, but for demo purposes:
         registrationData.push(Math.floor(Math.random() * 5) + 1);
     }
-    
+
     new Chart(registrationCtx, {
         type: 'line',
         data: {

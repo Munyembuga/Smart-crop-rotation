@@ -14,7 +14,7 @@
     <style>
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #2c5530 0%, #4a7c4f 100%);
+            background: #0ac15e;
             color: white;
             transition: all 0.3s;
         }
@@ -47,11 +47,13 @@
 
         .navbar-brand {
             font-weight: 700;
-            color: #2c5530 !important;
+            color: white !important;
+
         }
 
         .navbar {
-            background: white !important;
+
+            background: #0ac15e !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
